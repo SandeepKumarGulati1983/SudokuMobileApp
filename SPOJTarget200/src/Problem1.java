@@ -25,15 +25,26 @@ public class Problem1 {
 		// repeat
 		// ---------------------------
 
-		String r1 = new String("170800009");
-		String r2 = new String("006010007");
-		String r3 = new String("000007050");
-		String r4 = new String("004905008");
-		String r5 = new String("080060090");
-		String r6 = new String("900403500");
-		String r7 = new String("050700000");
-		String r8 = new String("700090600");
-		String r9 = new String("800006021");
+//		String r1 = new String("170800009");
+//		String r2 = new String("006010007");
+//		String r3 = new String("000007050");
+//		String r4 = new String("004905008");
+//		String r5 = new String("080060090");
+//		String r6 = new String("900403500"); // 
+//		String r7 = new String("050700000");
+//		String r8 = new String("700090600");
+//		String r9 = new String("800006021");
+		
+		
+		String r1 = new String("200500076");
+		String r2 = new String("300060500");
+		String r3 = new String("800700421");
+		String r4 = new String("560030008");
+		String r5 = new String("030106050");
+		String r6 = new String("900070034"); 
+		String r7 = new String("623007005");
+		String r8 = new String("005020003");
+		String r9 = new String("180009007");
 
 		String[] sMatrix = new String[] { r1, r2, r3, r4, r5, r6, r7, r8, r9 };
 
@@ -45,10 +56,72 @@ public class Problem1 {
 		// Another way with HashMap
 		HashMap<Integer, Cell> suMatrix = instance.createSudokuMap(sMatrix);
 		instance.showCurrentMatrixStatus(suMatrix);
+
 		// 2.
 		// instance.scan(sudokuMatrix, sMatrix.length);
 		instance.scan(suMatrix);
 		instance.showPossibilityMatrixStatus(suMatrix);
+
+		/*
+		 * 3. Now options are scanned next is to provide a conditioned that if option
+		 * array has one value means length is one , then assign to cell's value and
+		 * scan again repete this and scan again check that all value filled or not if
+		 * filled then done else keep the copy of same as origional sudoku and take a
+		 * wild guess scan again , if compleated - done , if not take another guess if
+		 * failed - reset the sudoku again and now take any other guess , like guess + 1
+		 */
+
+		/*
+		 * 3.1 check for option array leangth and start assigning values
+		 */
+		instance.assignvalueIfHaveSingleOption(suMatrix);
+		instance.showPossibilityMatrixStatus(suMatrix);
+		
+		instance.scan(suMatrix);
+		instance.showPossibilityMatrixStatus(suMatrix);
+		
+		instance.assignvalueIfHaveSingleOption(suMatrix);
+		instance.showPossibilityMatrixStatus(suMatrix);
+		
+		instance.scan(suMatrix);
+		instance.showPossibilityMatrixStatus(suMatrix);
+		
+		instance.assignvalueIfHaveSingleOption(suMatrix);
+		instance.showPossibilityMatrixStatus(suMatrix);
+		
+		instance.scan(suMatrix);
+		instance.showPossibilityMatrixStatus(suMatrix);
+		
+		instance.assignvalueIfHaveSingleOption(suMatrix);
+		instance.showPossibilityMatrixStatus(suMatrix);
+		
+		instance.scan(suMatrix);
+		instance.showPossibilityMatrixStatus(suMatrix);
+		
+		instance.assignvalueIfHaveSingleOption(suMatrix);
+		instance.showPossibilityMatrixStatus(suMatrix);
+		
+		instance.scan(suMatrix);
+		instance.showPossibilityMatrixStatus(suMatrix);
+		
+		instance.assignvalueIfHaveSingleOption(suMatrix);
+		instance.showPossibilityMatrixStatus(suMatrix);
+		
+		instance.scan(suMatrix);
+		instance.showPossibilityMatrixStatus(suMatrix);
+		
+		instance.assignvalueIfHaveSingleOption(suMatrix);
+		instance.showPossibilityMatrixStatus(suMatrix);
+		
+		instance.scan(suMatrix);
+		instance.showPossibilityMatrixStatus(suMatrix);
+		
+		instance.assignvalueIfHaveSingleOption(suMatrix);
+		instance.showPossibilityMatrixStatus(suMatrix);
+		
+		instance.scan(suMatrix);
+		instance.showPossibilityMatrixStatus(suMatrix);
+
 	}
 
 	int suType;
@@ -57,9 +130,9 @@ public class Problem1 {
 		int value;
 		boolean fixed;
 		boolean guess;
-		HashMap optionsArr;
+		HashMap<Integer, Integer> optionsArr;
 
-		Cell(int v, int size, HashMap possibility, boolean filled) {
+		Cell(int v, int size, HashMap<Integer, Integer> possibility, boolean filled) {
 			this.value = v;
 			this.fixed = filled;
 			this.guess = false;
@@ -105,7 +178,7 @@ public class Problem1 {
 		int length = this.suType;
 
 		for (int i = 0; i < length * length; i++) {
-			if (!suMatrix.get(i).fixed) {
+			if (suMatrix.get(i).value ==0) {
 				scanQuardrent(suMatrix, i);
 				scanRow(suMatrix, i);
 				scanColumn(suMatrix, i);
@@ -113,6 +186,33 @@ public class Problem1 {
 		}
 		return suMatrix;
 	}
+
+	HashMap<Integer, Cell> assignvalueIfHaveSingleOption(HashMap<Integer, Cell> suMatrix) {
+
+		for (int i = 0; i < this.suType * this.suType; i++) {
+			Cell cell = suMatrix.get(i);
+			if (cell.value == 0) {
+				if (cell.optionsArr.size() == 1) {
+					int j = 0;
+					while (true) {
+						if (cell.optionsArr.containsKey(j)) {
+							cell.value = cell.optionsArr.get(j);
+							cell.optionsArr.remove(j);
+							suMatrix.replace(i, suMatrix.get(i), cell);
+							break;
+						}
+						j++;
+					}
+
+				}
+			}
+		}
+		return suMatrix;
+	}
+
+	/*
+	 * ===========================UTILITY methods
+	 */
 
 	void scanQuardrent(HashMap<Integer, Cell> suMatrix, int cellPosition) {
 		/*
@@ -127,19 +227,16 @@ public class Problem1 {
 		/*
 		 * 3*0 +0 = 0 3*0+1 = 1 3*0 +2 = 2
 		 * 
-		 * 3*1 +0 = 3 
-		 * 3*1 +1 = 4 
-		 * 3*1 + 2 = 5
+		 * 3*1 +0 = 3 3*1 +1 = 4 3*1 + 2 = 5
 		 * 
 		 * 3*2 +0 = 6 3*2+1 = 7 3*2 + 2 = 8
 		 */
-		int rowQuardrent = row / quardSqt ;
+		int rowQuardrent = row / quardSqt;
 		int colQuardrent = col / quardSqt;
-				
-		for (int i = 0; i < quardSqt; i++) { // 1, 2 and 3 quard's cell i will lies in 0 to 2
 
-			for (int j = 0 ; j < quardSqt; j++) {
-				scanCell((quardSqt*rowQuardrent) + i, (quardSqt*colQuardrent) +j, suMatrix, cellPosition);
+		for (int i = 0; i < quardSqt; i++) { // 1, 2 and 3 quard's cell i will lies in 0 to 2
+			for (int j = 0; j < quardSqt; j++) {
+				scanCell((quardSqt * rowQuardrent) + i, (quardSqt * colQuardrent) + j, suMatrix, cellPosition);
 			}
 		}
 
@@ -164,7 +261,7 @@ public class Problem1 {
 		int currentcellPosition = row * 9 + col;
 		Cell currentCell = suMatrix.get(currentcellPosition);
 		Cell targetCell = suMatrix.get(cellPosition);
-		if (currentCell.fixed) {
+		if (currentCell.value!=0) {
 			if (targetCell.optionsArr.containsKey(currentCell.value - 1))
 				targetCell.optionsArr.remove(currentCell.value - 1);
 		}
@@ -194,56 +291,9 @@ public class Problem1 {
 			if (possibilityMatrix.containsKey(i))
 				System.out.print(possibilityMatrix.get(i));
 		}
-		System.out.print(" ");
+		System.out.print("* ");
 
 	}
-
-	/*
-	 * instead of preparing a Matrix of array , its better to prepare a hash map for
-	 * fast searching
-	 */
-	// Cell[][] createSudoku(String[] values) {
-	// Cell[][] matrix = new Cell[values.length][values.length];
-	// for (int i = 0; i < values.length; i++) {
-	// for (int j = 0; j < values.length; j++) {
-	//
-	// // System.out.print(values[i].charAt(j));
-	// int cellValue = values[i].charAt(j) - '0';// *******Very important
-	// conversion****
-	// if (cellValue == 0) {
-	// matrix[i][j] = new Cell(cellValue, values.length,
-	// getPossibilityArray(values.length), false);
-	// } else {
-	// matrix[i][j] = new Cell(cellValue, values.length, null, true);
-	// }
-	// // System.out.print(matrix[i][j].value +" "+ matrix[i][j].fixed +" ");
-	// if (matrix[i][j].value == 0) {
-	// showPossibilityMatrix(matrix[i][j].optionsArr, values.length);
-	// } else {
-	// System.out.print(" " + matrix[i][j].value + " ");
-	// }
-	// }
-	// System.out.println("");
-	// }
-	// return matrix;
-	// }
-
-	// Cell[][] scan(Cell[][] sudokuMatrix, int sudokuSize) {
-	//
-	// for (int i = 0; i < sudokuSize; i++) {
-	// for (int j = 0; j < sudokuSize; j++) {
-	// if (!sudokuMatrix[i][j].fixed) {
-	//
-	// // fillOptionsArray(sudokuMatrix[i][j].optionsArr, scanQuad, scanCol,
-	// // scanInRow);
-	//
-	// }
-	// }
-	//
-	// }
-	//
-	// return sudokuMatrix;
-	// }
 
 	void showCurrentMatrixStatus(HashMap<Integer, Cell> matrix) {
 		System.out.println("");
@@ -258,6 +308,7 @@ public class Problem1 {
 	}
 
 	void showPossibilityMatrixStatus(HashMap<Integer, Cell> matrix) {
+		System.out.println("");
 		System.out.println("");
 		for (int i = 0; i < this.suType * this.suType; i++) {
 			if (i > 0 && i % 9 == 0) {
